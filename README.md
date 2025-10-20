@@ -262,7 +262,7 @@ This will allow you to run inference on the whole test split of your dataset, re
 
 After cloning, copying and replacing all files, we replace the existing `vnn_yolomodel.c` in the `YOLO_validation` directory, the `vnn_yolomodel.h` in the `YOLO_validation/include`, and the `yolo_model.nb` in the `YOLO_validation/bin/nb_model` with the corresponding files generated previously by the conversion tool.
 
-You will also need to create the `output_images` directory here to store the results.
+You will also need to create the `output_images` directory here to store the results. Then, inside `YOLO_validation\main.cpp`, change the `output_dir` to whatever file name you want, for example, `output_dir\yolo_v8n`, to better store the results of your models.
 
 To run inference, we go into the `YOLO_validation` directory and run the following line.
 
@@ -273,7 +273,7 @@ bash build_vx.sh
 And finally, we move to the `YOLO_validation/bin` directory and run the last command.
 
 ```bash
-./run_validation --output_dir "example_dir"
+./run_validation
 ```
 
 The output_dir paramater will determine where the results wil be stored inside the `YOLO_validation/bin/output_images`. 
