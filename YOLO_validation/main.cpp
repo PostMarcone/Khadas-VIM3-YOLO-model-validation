@@ -48,7 +48,7 @@ namespace fs = std::filesystem;
 
 const char *model_path = "nb_model/yolo_model.nb";
 std::string input_dir = "input_images";
-std::string output_dir = "output_dirs/v8s_prune/prune20";
+std::string output_dir = "output_dirs/v8n;
 
 vsi_nn_graph_t * g_graph = NULL;
 
@@ -124,10 +124,9 @@ int run_detect_model(){
 					return -1;
 				}
 				
-				// Converter a imagem para a resolucao que o modelo aceita
 				cv::resize(img, tmp_image, tmp_image.size());
 			
-				// Alterar a ordem dos canais de cores para RGB (o que o yolo está treinada para aceitar)
+				// Change the RGB channel order
 				cv::cvtColor(tmp_image, tmp_image, cv::COLOR_BGR2RGB);
 				tmp_image.convertTo(tmp_image, CV_32FC3);
 
@@ -149,41 +148,33 @@ int run_detect_model(){
 				struct timespec t1_start, t1_end;
 				struct timespec t2_start, t2_end;
 				struct timespec t3_start, t3_end;
-				
-				//cv::imshow("Image Window",tmp_image);
-   			    //cv::waitKey(0);
 
 				clock_gettime(CLOCK_MONOTONIC, &total_start);
 
-				// Pre-Processamento
+				// Pre-Processing
 				clock_gettime(CLOCK_MONOTONIC, &t1_start);
 				model_preprocess(image, g_graph, g_nn_width, g_nn_height, g_nn_channel, tensor);
 				clock_gettime(CLOCK_MONOTONIC, &t1_end);
-				//printf("Preprocess took: %.6f seconds\n", time_diff(t1_start, t1_end));
 				pre_processing_total_time += time_diff(t1_start, t1_end);
 
-				// Inferencia
+				// Inference
 				clock_gettime(CLOCK_MONOTONIC, &t2_start);
 				vsi_nn_RunGraph(g_graph);
 				clock_gettime(CLOCK_MONOTONIC, &t2_end);
 				//printf("Inference took: %.6f seconds\n", time_diff(t2_start, t2_end));
 				inference_total_time += time_diff(t2_start, t2_end);
                 
-				// Pos-Processamento
+				// Post-Processing
 				clock_gettime(CLOCK_MONOTONIC, &t3_start);
 				model_postprocess(g_graph, &resultData);
 				clock_gettime(CLOCK_MONOTONIC, &t3_end);
-				//printf("Postprocess took: %.6f seconds\n", time_diff(t3_start, t3_end));
 				post_processing_total_time += time_diff(t3_start, t3_end);
 
 				clock_gettime(CLOCK_MONOTONIC, &total_end);
-				//printf("Total time: %.6f seconds\n", time_diff(total_start, total_end));
 				img_processing_total_time += time_diff(total_start, total_end);
 
 				// Draw and show results
 				draw_results(img, resultData, img.cols, img.rows);
-				//cv::imwrite("result.jpg", img); // Save output image
-				//cv::waitKey(0);  // Keep window open
 
 				std::ofstream outfile(output_filename);
 				for (int i = 0; i < resultData.detect_num; i++) {
@@ -192,7 +183,6 @@ int run_detect_model(){
 					int right = resultData.point[i].point.rectPoint.right*img.cols;
 					int bottom = resultData.point[i].point.rectPoint.bottom*img.rows;	
 								
-					//cout << resultData.result_name[i].lable_name_only << " " << resultData.result_name[i].confidence << " " << left << " " << top << " " << right << " " << bottom << '\n';
 					outfile << resultData.result_name[i].lable_name_only << " " << resultData.result_name[i].confidence << " " << left << " " << top << " " << right << " " << bottom<< '\n';
 				}
 			}

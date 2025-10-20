@@ -297,16 +297,15 @@ static void flatten(float *x, int size, int layers, int batch, int forward)
 int yolo_v3_post_process_onescale(float *predictions, int input_size[3] , box *boxes, float **probs, float threshold_in)
 {
     int i,j,k,index;
-    int num_class = 18;
     int coords = 64;
-    int bb_size = coords + num_class;
+    int bb_size = coords + NUM_CLASS;
     int modelWidth = input_size[0];
     int modelHeight = input_size[1];
     float threshold = threshold_in;
     float max_prob;
 
     for (j = 0; j < modelWidth*modelHeight; ++j)
-        probs[j] = (float *)calloc(num_class+1, sizeof(float *));
+        probs[j] = (float *)calloc(NUM_CLASS+1, sizeof(float *));
 
     for (i = 0; i < modelHeight; ++i)
     {
@@ -314,13 +313,13 @@ int yolo_v3_post_process_onescale(float *predictions, int input_size[3] , box *b
     	{
     		index = i * modelHeight + j;
     		max_prob = 0;
-    		for (k = 0; k < num_class; ++k)
+    		for (k = 0; k < NUM_CLASS; ++k)
     		{
     			float prob = logistic_activate(predictions[index * bb_size + k]);
     			probs[index][k] = (prob > threshold) ? prob : 0;
     			max_prob = (prob > threshold && prob > max_prob) ? prob : max_prob;
     		}
-    		int box_index = index * bb_size + num_class;
+    		int box_index = index * bb_size + NUM_CLASS;
     		boxes[index] = get_region_box(predictions, box_index, i, j, modelWidth, modelHeight);
     		boxes[index].prob_obj = (max_prob > threshold) ? max_prob : 0;
     	}
@@ -341,13 +340,12 @@ void model_postprocess(vsi_nn_graph_t *graph, pDetResult resultData)
     nn_height = tensor->attr.size[1];
     nn_channel = tensor->attr.size[2];
     (void)nn_channel;
-    int size[3]={nn_width/32, nn_height/32, 18 + 64};
+    int size[3]={nn_width/32, nn_height/32, NUM_CLASS + 64};
 
     int sz[10];
     int i, j, stride;
     int output_cnt = 0;
     int output_len = 0;
-    int num_class = 18;
     float threshold = 0.3;
     float iou_threshold = 0.5;
     float *predictions = NULL;
@@ -436,7 +434,7 @@ void model_postprocess(vsi_nn_graph_t *graph, pDetResult resultData)
     int size2[3] = {size[0]*2,size[1]*2,size[2]};
     int size4[3] = {size[0]*4,size[1]*4,size[2]};
     int len1 = size[0]*size[1]*size[2];
-    int box1 = len1/(num_class+64);
+    int box1 = len1/(NUM_CLASS+64);
 
     box *boxes = (box *)calloc(box1*(1+4+16), sizeof(box));
     float **probs = (float **)calloc(box1*(1+4+16), sizeof(float *));
@@ -444,8 +442,8 @@ void model_postprocess(vsi_nn_graph_t *graph, pDetResult resultData)
     yolo_v3_post_process_onescale(&predictions[0], size4, boxes, &probs[0], threshold); //final layer
     yolo_v3_post_process_onescale(&predictions[len1*16], size2, &boxes[box1*16], &probs[box1*16], threshold);
     yolo_v3_post_process_onescale(&predictions[len1*(16+4)], size,  &boxes[box1*(16+4)], &probs[box1*(16+4)], threshold);
-    do_nms_sort(boxes, probs, box1*21, num_class, iou_threshold);
-    get_detections_result(resultData, box1*21, threshold, boxes, probs, coco_names, num_class);
+    do_nms_sort(boxes, probs, box1*21, NUM_CLASS, iou_threshold);
+    get_detections_result(resultData, box1*21, threshold, boxes, probs, coco_names, NUM_CLASS);
 
     free(boxes);
     boxes = NULL;

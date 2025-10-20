@@ -1,5 +1,5 @@
 # Testing and validating YOLO models
-This project aims to enable the validation and testing of YOLO models, after acceleration on the KHaDAS VIM3 using its NPU, as well as after quantization. This allows us to obtain not only the inference time of these models, but also their accuracy.
+This project enables the validation and testing of YOLO models, after acceleration on the KHADAS VIM3, by utilizing its NPU, as well as after quantization. This allows us to obtain not only the inference time of these models, but also their accuracy.
 
 # Full pipeline from YOLO pt model to running it on Khadas VIM3
 
@@ -254,13 +254,15 @@ After modifying the three files and adding the ONNX file, we can return to the `
 The three important files that we will later need to send to the Khadas board are `vnn_yolomodel.c`, `vnn_yolomodel.h`, and `yolo_model.nb`.
 
 ## Step 4 - Running the model on Khadas
-The next step is to run inference on the Khadas board using the converted model and analyzing the results. For this, we can copy the `YOLO_validation` file to the Khadas VIM3.
+The next step is to run inference on the Khadas board using the converted model and analyzing the results. For this, we first clone the official Khadas respository available [here](https://github.com/khadas/vim3_npu_applications_lite/tree/master/yolov8n_demo_x11_usb "Khadas Official Demo Repo").
+
+After cloning the repo, copy and replace all files from `YOLO_validation` into the cloned repo. Additionally, inside the cloned `include` folder, change the `MAX_DETECT_NUM`, inside the `nn_detect_utils.h` file, to a higher value, so that the model is able to detect more objects in one image. Furthermore, inside the `YOLO_validation/include/model_pre_post_processing.h` and `YOLO_validation/model_pre_post_processing.c` files, it is possible to change the number of classes your dataset has, as well as the class labels themselves, respectivelly. Change these values to match your own dataset's values.
 
 This will allow you to run inference on the whole test split of your dataset, returning the average inference speed per image, aswell as pre-processing and post-processing speeds per image, and the average FPS your model achieves. Additionally, it stores all detection results and bounding boxes, so that we can later run against the dataset's ground-truth bounding boxes to achieve the model's precision.
 
-After cloning, we replace the existing `vnn_yolomodel.c` in the `YOLO_validation` directory, the `vnn_yolomodel.h` in the `YOLO_validation/include`, and the `yolo_model.nb` in the `YOLO_validation/bin/nb_model` with the corresponding files generated previously by the conversion tool.
+After cloning, copying and replacing all files, we replace the existing `vnn_yolomodel.c` in the `YOLO_validation` directory, the `vnn_yolomodel.h` in the `YOLO_validation/include`, and the `yolo_model.nb` in the `YOLO_validation/bin/nb_model` with the corresponding files generated previously by the conversion tool.
 
-You will also need to create the `input_images` directory inside the `YOLO_validation/bin` directory, and place all your test images there. Additionally, you also need to create the `output_images` directory here to store the results.
+You will also need to create the `output_images` directory here to store the results.
 
 To run inference, we go into the `YOLO_validation` directory and run the following line.
 
@@ -268,7 +270,7 @@ To run inference, we go into the `YOLO_validation` directory and run the followi
 bash build_vx.sh
 ```
 
-And finally we move to the `YOLO_validation/bin` directory and run the last command.
+And finally, we move to the `YOLO_validation/bin` directory and run the last command.
 
 ```bash
 ./run_validation --output_dir "example_dir"
@@ -287,3 +289,16 @@ To use it, you first need to copy Khadas's results to the `YOLO_metrics\input\de
 py map5095.py --dr "yolov8n"
 ```
 Here, the `--dr` parameter represents the results obtained in Khadas, stored in the `YOLO_metrics\input\detection-results` directory. The results of this code will then be available in `mAP\output\yolov8n`, under the same name as the input folder. Additionally, the mAP@50-95 value will be printed on the terminal.
+
+# Acknowledgment
+
+This project includes adapted code from the repository:
+[Cartucho/mAP](https://github.com/Cartucho/mAP), licensed under the Apache License 2.0.
+
+Modifications made:
+- Added support for mAP@50–95 calculation.
+- Added functionality to store and manage multiple test results without overwriting.
+- Adapted paths and integration with Khadas YOLO output directories.
+
+Original license text is available in `YOLO_metrics/LICENSE` and at:
+http://www.apache.org/licenses/LICENSE-2.0

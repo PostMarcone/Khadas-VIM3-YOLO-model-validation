@@ -11,6 +11,8 @@ extern "C"{
 typedef unsigned char   uint8_t;
 typedef unsigned int   uint32_t;
 
+#define NUM_CLASS 18
+
 void model_preprocess(input_image_t imageData, vsi_nn_graph_t *g_graph, int nn_width, int nn_height, int channels, vsi_nn_tensor_t *tensor);
 void model_postprocess(vsi_nn_graph_t *graph, pDetResult resultData);
 
