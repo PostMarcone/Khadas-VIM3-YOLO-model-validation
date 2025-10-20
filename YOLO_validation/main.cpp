@@ -48,7 +48,7 @@ namespace fs = std::filesystem;
 
 const char *model_path = "nb_model/yolo_model.nb";
 std::string input_dir = "input_images";
-std::string output_dir = "output_dirs/v8n;
+std::string output_dir = "output_dirs/v8n";
 
 vsi_nn_graph_t * g_graph = NULL;
 
