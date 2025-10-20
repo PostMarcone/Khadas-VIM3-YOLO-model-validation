@@ -50,7 +50,6 @@ void print_progress_bar(size_t current, size_t total) {
 	std::cout << "\r[";
     	for (size_t i = 0; i < bar_width; ++i) {
         	if (i < pos) std::cout << "#";
-        	//else if (i == pos) std::cout << ">";
         	else std::cout << ".";
     	}
     	std::cout << "] " << int(progress * 100.0) << "% completion!" << std::flush;
@@ -79,7 +78,6 @@ void image_debug_info(cv::Mat& image){
     cv::minMaxLoc(image, &min_val, &max_val);
     std::cout << "Pixel Range: min=" << min_val << ", max=" << max_val << std::endl;
     
-    // Optional: print a sample pixel
     cv::Vec3f sample = image.at<cv::Vec3f>(image.rows / 2, image.cols / 2);
     std::cout << "Sample pixel at center: R=" << sample[0] << " G=" << sample[1] << " B=" << sample[2] << std::endl;
     
@@ -93,11 +91,9 @@ void draw_results(cv::Mat& frame, DetectResult resultData, int img_width, int im
 
 	for (i = 0; i < resultData.detect_num; i++) {
 		left =  resultData.point[i].point.rectPoint.left*img_width;
-        right = resultData.point[i].point.rectPoint.right*img_width;
-        top = resultData.point[i].point.rectPoint.top*img_height;
-        bottom = resultData.point[i].point.rectPoint.bottom*img_height;
-		
-	    //cout << "i:" <<resultData.detect_num <<" left:" << left <<" right:" << right << " top:" << top << " bottom:" << bottom <<endl;
+        	right = resultData.point[i].point.rectPoint.right*img_width;
+       	 	top = resultData.point[i].point.rectPoint.top*img_height;
+        	bottom = resultData.point[i].point.rectPoint.bottom*img_height;
 
 		cv::Rect rect(left, top, right-left, bottom-top);
 		cv::rectangle(frame,rect,obj_id_to_color(resultData.result_name[i].lable_id),1,8,0);
@@ -108,6 +104,6 @@ void draw_results(cv::Mat& frame, DetectResult resultData, int img_width, int im
 		cv::putText(frame,resultData.result_name[i].lable_name,cvPoint(left+5,top-5),cv::FONT_HERSHEY_COMPLEX,0.5,cv::Scalar(0,0,0),1);
 	}
 
-	//cv::imshow("Image Window",frame);
-	//cv::waitKey(0);
+	cv::imshow("Image Window",frame);
+	cv::waitKey(0);
 }

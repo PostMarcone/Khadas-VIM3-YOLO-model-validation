@@ -161,7 +161,6 @@ int run_detect_model(){
 				clock_gettime(CLOCK_MONOTONIC, &t2_start);
 				vsi_nn_RunGraph(g_graph);
 				clock_gettime(CLOCK_MONOTONIC, &t2_end);
-				//printf("Inference took: %.6f seconds\n", time_diff(t2_start, t2_end));
 				inference_total_time += time_diff(t2_start, t2_end);
                 
 				// Post-Processing
