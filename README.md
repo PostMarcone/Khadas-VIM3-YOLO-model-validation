@@ -275,8 +275,7 @@ And finally, we move to the `YOLO_validation/bin` directory and run the last com
 ```bash
 ./run_validation
 ```
-
-The output_dir paramater will determine where the results wil be stored inside the `YOLO_validation/bin/output_images`. 
+The results will then be available inside the `YOLO_validation/bin/output_dirs` folder.
 
 ## Step 5 - Checking the model's precision
 Finally, the last step is to check the model's precision. To do this, we copy Khadas's inference results, the ones we store in `YOLO_validation/bin/output_images`, to our PC. Here we can use the YOLO_metrics folder's contents.
